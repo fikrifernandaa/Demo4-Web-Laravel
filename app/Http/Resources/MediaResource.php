@@ -19,7 +19,6 @@ class MediaResource extends JsonResource
             'aura'     => $this->aura,
             'synopsis' => $this->synopsis,
 
-            // Relasi hanya muncul bila sudah di-load (with()/load()/withCount()).
             'users_count' => $this->whenCounted('users'),
             'users'       => $this->whenLoaded('users', fn () => $this->users->map(fn ($user) => [
                 'id'       => $user->id,
@@ -27,7 +26,6 @@ class MediaResource extends JsonResource
                 'added_at' => $user->pivot->created_at,
             ])),
 
-            // Hanya muncul saat media diambil lewat relasi koleksi user (pivot).
             'added_at' => $this->whenPivotLoaded('media_user', fn () => $this->pivot->created_at),
         ];
     }

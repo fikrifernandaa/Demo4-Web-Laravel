@@ -13,7 +13,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UserController extends Controller
 {
-    /** GET /api/users -> daftar pengguna + jumlah media di koleksinya. */
     public function index(): AnonymousResourceCollection
     {
         return UserResource::collection(
@@ -21,13 +20,11 @@ class UserController extends Controller
         );
     }
 
-    /** GET /api/users/{user} -> detail pengguna beserta koleksi medianya. */
     public function show(User $user): UserResource
     {
         return new UserResource($user->load('media')->loadCount('media'));
     }
 
-    /** GET /api/users/{user}/collection -> koleksi media milik pengguna. */
     public function collection(User $user): AnonymousResourceCollection
     {
         return MediaResource::collection(
@@ -35,15 +32,10 @@ class UserController extends Controller
         );
     }
 
-    /**
-     * POST /api/users/{user}/collection  body: { "media_id": 1 }
-     * Custom action: mengubah relasi (attach) tanpa membuat data Media baru.
-     */
     public function addToCollection(AddToCollectionRequest $request, User $user): JsonResponse
     {
         $mediaId = (int) $request->validated('media_id');
 
-        // Cek duplikat -> 409 Conflict (request valid, tapi bentrok dengan data yang ada).
         if ($user->media()->wherePivot('media_id', $mediaId)->exists()) {
             return $this->conflict();
         }
@@ -51,8 +43,6 @@ class UserController extends Controller
         try {
             $user->media()->attach($mediaId);
         } catch (UniqueConstraintViolationException) {
-            // Jaring pengaman race condition: dua request bersamaan lolos cek di atas,
-            // unique index pada pivot menolak yang kedua.
             return $this->conflict();
         }
 
@@ -62,7 +52,6 @@ class UserController extends Controller
             ->setStatusCode(201);
     }
 
-    /** DELETE /api/users/{user}/collection/{media} -> detach dari koleksi. */
     public function removeFromCollection(User $user, Media $media): JsonResponse
     {
         if ($user->media()->detach($media->id) === 0) {

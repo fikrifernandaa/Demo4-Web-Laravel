@@ -14,13 +14,11 @@ class StoreMediaRequest extends FormRequest
 
     public function rules(): array
     {
-        // POST -> semua field wajib; PATCH -> hanya field yang dikirim yang divalidasi.
         $r = $this->isMethod('PATCH') ? 'sometimes' : 'required';
 
         return [
             'title'    => [
                 $r, 'string', 'max:255',
-                // Saat update, abaikan judul milik media itu sendiri.
                 Rule::unique('media', 'title')->ignore($this->route('media')),
             ],
             'type'     => [$r, Rule::in(['Anime', 'Film', 'Series'])],

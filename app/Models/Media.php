@@ -25,13 +25,11 @@ class Media extends Model
         'episodes' => 'integer',
     ];
 
-    /** Pengguna yang memasukkan media ini ke koleksinya. */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    /** Query scope: filter berdasarkan judul (setara searchByTitle() di Modul 3). */
     public function scopeTitleLike(Builder $query, ?string $keyword): Builder
     {
         return $query->when(

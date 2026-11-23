@@ -9,7 +9,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -31,7 +30,6 @@ class User extends Authenticatable
         ];
     }
 
-    /** Koleksi media milik pengguna (setara $collection di class User Modul 3). */
     public function media(): BelongsToMany
     {
         return $this->belongsToMany(Media::class)->withTimestamps();
